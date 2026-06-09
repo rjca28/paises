@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FPN · Comparação entre países</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--navy:#11324d;--navy2:#1c4a72;--blue:#185FA5;--blue-l:#9fb6cc;--gold:#BA7517;--gold-l:#d9b77c;
+--bg:#f6f8fb;--card:#fff;--line:#e6edf3;--ink:#1f2d3a;--muted:#5b6b7a;--good:#1f8a55;--bad:#c0392b;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.hero{position:relative;background:linear-gradient(160deg,var(--navy),var(--navy2));color:#fff;overflow:hidden;padding:46px 0 40px}
+.hero svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.hero .wrap{position:relative}
+.kicker{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:#9ec3ec;font-weight:700}
+.hero h1{font-size:33px;line-height:1.12;margin:12px 0 8px;font-weight:800;letter-spacing:-.01em}
+.hero p{max-width:760px;color:#d6e4f3;font-size:15.5px;margin:0}
+.badge{display:inline-block;margin-top:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 14px;font-size:13px}
+section{padding:30px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:800}
+h2.sect{font-size:23px;margin:8px 0 6px;font-weight:800;color:var(--navy);letter-spacing:-.01em}
+.lead{color:var(--muted);max-width:820px;margin:0 0 18px}
+/* controls */
+.bar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 0 rgba(17,50,77,.03)}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.ctl .cl{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.seg{display:inline-flex;background:#eef2f7;border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 13px;border-radius:8px;font-weight:700;color:var(--muted);cursor:pointer;font-size:14px}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(17,50,77,.12)}
+select{border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:14px;background:#fff;color:var(--ink);min-width:170px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.kpi .v{font-size:26px;font-weight:800;color:var(--navy);line-height:1.05}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+.kpi .v.good{color:var(--good)} .kpi .v.bad{color:var(--bad)}
+/* expl + table */
+.expl{background:#fbfaf6;border:1px solid #ece3cf;border-left:5px solid var(--gold);border-radius:12px;padding:15px 18px;color:#2c3a47;margin:6px 0 16px}
+.expl b{color:var(--navy)}
+.grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+.chartbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;height:430px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid #eef2f6}
+th:first-child,td:first-child{text-align:left}
+thead th{background:#f1f5f9;color:var(--navy);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+tbody tr:last-child td{border-bottom:0}
+td.pos{color:var(--bad);font-weight:700} td.neg{color:var(--good);font-weight:700}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+.tag.a{background:#eaf2fb;color:var(--blue)} .tag.b{background:#fbf1e2;color:var(--gold)}
+.note{font-size:12.5px;color:var(--muted)}
+.empty{background:var(--card);border:1px dashed var(--blue-l);border-radius:14px;padding:26px;color:var(--muted);text-align:center}
+.empty b{color:var(--navy)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px;margin-top:14px}
+summary{cursor:pointer;font-weight:700;color:var(--navy);padding:10px 0}
+textarea{width:100%;min-height:120px;font:12.5px/1.45 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:9px;padding:10px}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:700;cursor:pointer}
+.btn.alt{background:var(--gold)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.pill{font-size:12px;background:#eef2f7;border-radius:999px;padding:4px 10px;color:var(--navy);font-weight:700}
+.msg{font-size:13px;margin-top:8px}
+footer{background:var(--navy);color:#bcd0e6;padding:26px 0;font-size:13px}
+footer b{color:#fff}
+@media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.hero h1{font-size:26px}}
+</style></head><body>
+
+<header class="hero">
+ <svg viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#7fb0e6" stroke-width="1.1">
+ <path d="M0,90 C200,60 400,120 600,90 C800,60 1000,120 1200,90"/><path d="M0,140 C200,110 400,170 600,140 C800,110 1000,170 1200,140"/>
+ <path d="M0,190 C200,160 400,220 600,190 C800,160 1000,220 1200,190"/><path d="M0,240 C200,210 400,270 600,240 C800,210 1000,270 1200,240"/></g></svg>
+ <div class="wrap">
+  <div class="kicker">Federação Portuguesa de Natação · Alto Rendimento</div>
+  <h1>Comparação entre países</h1>
+  <p>Avalia o nível de cada país face à Europa e coloca dois países frente a frente, sobre o núcleo de elite — as <b>2, 3 ou 4 melhores marcas</b> por prova, nas 17 provas individuais do programa LA28, em piscina longa.</p>
+  <span class="badge">Top-2/3/4 · Masculino &amp; Feminino · Épocas 2025 e 2026</span>
+ </div>
+</header>
+
+<section><div class="wrap">
+ <div class="eyebrow">Parâmetros</div>
+ <h2 class="sect">Escolha o que comparar</h2>
+ <div class="bar">
+  <div class="ctl"><span class="cl">Modo</span><div class="seg" id="segMode">
+     <button data-m="eur" class="on">País vs Europa</button><button data-m="vs">País vs País</button></div></div>
+  <div class="ctl"><span class="cl">Melhores marcas (N)</span><div class="seg" id="segN">
+     <button data-n="2">2</button><button data-n="3" class="on">3</button><button data-n="4">4</button></div></div>
+  <div class="ctl"><span class="cl">Género</span><div class="seg" id="segG">
+     <button data-g="M" class="on">Masculino</button><button data-g="F">Feminino</button></div></div>
+  <div class="ctl"><span class="cl">Época</span><div class="seg" id="segY">
+     <button data-y="2025">2025</button><button data-y="2026" class="on">2026</button></div></div>
+  <div class="ctl" id="ctlA"><span class="cl" id="lblA">País</span><select id="selA"></select></div>
+  <div class="ctl" id="ctlB" style="display:none"><span class="cl">País B</span><select id="selB"></select></div>
+  <div class="ctl" id="ctlRef"><span class="cl">Referência «Europa»</span><select id="selRef"></select></div>
+ </div>
+ <p class="note" style="margin-top:10px">Convenções: tempo <b>menor é mais rápido</b>; distância <b>positiva</b> = país mais lento que a referência; evolução não se aplica nesta vista. A época 2026 é parcial, pelo que as distâncias dentro do mesmo ano são mais fiáveis do que comparações entre anos.</p>
+</div></section>
+
+<section><div class="wrap" id="panel"></div></section>
+
+<section><div class="wrap">
+ <details>
+  <summary>Carregar países (Europa, Portugal e outros)</summary>
+  <p class="lead" style="margin-top:10px">Esta ferramenta traz já os <b>Países Baixos</b> embebidos. Para acender as comparações com Portugal e a Europa, junte os dados de duas formas:</p>
+  <p style="font-weight:700;color:var(--navy);margin:6px 0">A) A partir do relatório FPN existente</p>
+  <p class="note">Cole o objeto <code>DATA.events</code> do relatório <i>FPN_Profundidade…html</i> (ou todo o <code>{events:…}</code>). São extraídas automaticamente todas as regiões presentes (ex.: <code>EUR</code>, <code>POR</code>) para as épocas e géneros disponíveis.</p>
+  <textarea id="impReport" placeholder='Cole aqui, p.ex.:  {"events":{"M":{"50 Free":{"raw":{"EUR":{"2026":[...]},"POR":{"2026":[...]}}}, ...}}}'></textarea>
+  <div class="row"><button class="btn" id="btnReport">Importar do relatório</button><span class="pill">EUR → «Europa» · POR → «Portugal»</span></div>
+  <p style="font-weight:700;color:var(--navy);margin:16px 0 6px">B) Manualmente (mesmo formato dos Países Baixos)</p>
+  <textarea id="impManual" placeholder='{"code":"FRA","label":"França","M":{"2026":{"50 Free":[21.8,22.0,...]}},"F":{...}}'></textarea>
+  <div class="row"><button class="btn alt" id="btnManual">Adicionar país</button>
+   <button class="btn" id="btnTemplate" style="background:#5b6b7a">Ver modelo (Países Baixos)</button></div>
+  <div class="msg" id="impMsg"></div>
+ </details>
+ <p class="note" style="margin-top:12px">Os países carregados ficam disponíveis em ambos os modos. O país marcado como «Europa» (referência) é o usado na avaliação de nível — por defeito procura o código <code>EUR</code>.</p>
+</div></section>
+
+<footer><div class="wrap">
+ <b>FPN · Comparação entre países.</b> Núcleo de elite (Top-2/3/4) nas 17 provas individuais LA28, piscina longa.
+ Fonte: rankings nacionais «Melhores 100» (swimrankings.net). Mesmas convenções do relatório de profundidade.
+</div></footer>
+
+<script>
+const COUNTRIES = {"NED": {"label": "Países Baixos", "M": {"2025": {"50 Free": [22.06, 22.07, 22.07, 22.22, 22.34, 22.61], "100 Free": [48.42, 48.86, 49.67, 49.78, 49.83, 50.02], "200 Free": [108.98, 109.88, 110.38, 111.38, 111.49, 111.64], "400 Free": [232.52, 234.27, 237.89, 238.53, 238.88, 240.37], "800 Free": [482.26, 487.03, 496.42, 499.3, 499.6, 503.73], "50 Back": [24.89, 25.84, 26.09, 26.16, 26.17, 26.25], "100 Back": [53.51, 55.52, 55.61, 55.95, 56.13, 56.19], "200 Back": [117.32, 119.14, 121.8, 122.57, 122.77, 125.18], "1500 Free": [931.03, 937.97, 947.73, 952.28, 957.4, 982.83], "50 Breast": [26.71, 26.94, 27.86, 27.96, 28.08, 28.31], "100 Breast": [59.03, 60.35, 60.53, 61.49, 61.65, 62.07], "200 Breast": [127.73, 131.0, 132.93, 133.17, 133.55, 134.56], "50 Fly": [22.72, 23.05, 23.14, 23.73, 23.98, 24.26], "100 Fly": [50.84, 52.07, 52.67, 53.01, 53.88, 54.2], "200 Fly": [119.26, 120.36, 120.59, 122.32, 126.48, 128.81], "200 IM": [120.04, 122.17, 125.77, 125.98, 126.33, 126.91], "400 IM": [254.19, 261.88, 269.65, 272.38, 275.5, 276.98]}, "2026": {"50 Free": [21.66, 21.96, 22.42, 22.46, 22.66, 22.7], "100 Free": [48.81, 49.39, 49.67, 50.04, 50.28, 50.56], "200 Free": [108.44, 110.6, 111.12, 111.51, 111.86, 112.04], "400 Free": [233.69, 233.71, 234.34, 235.34, 238.16, 239.91], "800 Free": [487.79, 489.86, 491.63, 500.49, 501.1, 503.05], "50 Back": [25.61, 25.67, 25.92, 26.2, 26.23, 26.24], "100 Back": [54.84, 55.05, 56.15, 56.67, 57.12, 57.24], "200 Back": [120.56, 122.71, 122.92, 125.08, 126.53, 126.86], "1500 Free": [942.06, 944.35, 961.91, 977.89, 979.35, 980.37], "50 Breast": [26.95, 27.37, 27.61, 27.92, 27.98, 28.25], "100 Breast": [59.37, 60.58, 60.77, 61.23, 61.56, 62.03], "200 Breast": [128.5, 131.95, 133.72, 136.33, 136.43, 137.44], "50 Fly": [23.04, 23.12, 23.62, 24.14, 24.14, 24.19], "100 Fly": [51.83, 53.0, 53.61, 54.18, 54.26, 55.19], "200 Fly": [119.19, 121.24, 123.33, 124.62, 128.01, 128.33], "200 IM": [124.28, 126.06, 126.61, 126.87, 127.5, 127.63], "400 IM": [263.39, 272.53, 274.23, 275.51, 277.03, 277.28]}}, "F": {"2025": {"50 Free": [24.23, 24.61, 24.74, 25.08, 25.23, 25.29], "100 Free": [52.55, 52.91, 54.62, 54.82, 55.12, 56.02], "200 Free": [120.18, 120.85, 120.98, 121.36, 121.49, 121.5], "400 Free": [252.61, 255.1, 256.38, 259.26, 260.41, 261.66], "800 Free": [521.96, 522.41, 529.63, 532.5, 549.06, 550.71], "50 Back": [27.53, 27.82, 28.22, 28.68, 28.87, 28.91], "100 Back": [58.96, 60.19, 61.1, 61.8, 61.82, 62.34], "200 Back": [131.56, 132.22, 132.48, 133.82, 135.8, 138.47], "1500 Free": [999.75, 1011.08, 1025.79, 1055.3, 1058.44, 1060.43], "50 Breast": [31.86, 31.91, 31.97, 32.07, 32.19, 32.2], "100 Breast": [67.9, 70.84, 70.95, 71.53, 71.56, 71.83], "200 Breast": [151.5, 152.65, 154.99, 155.86, 155.89, 157.19], "50 Fly": [25.65, 25.9, 26.73, 27.0, 27.18, 27.3], "100 Fly": [57.17, 59.91, 60.09, 60.2, 60.58, 60.87], "200 Fly": [131.34, 132.12, 133.69, 138.38, 138.47, 140.71], "200 IM": [136.38, 138.79, 138.95, 140.98, 141.42, 141.68], "400 IM": [293.2, 297.05, 297.56, 298.24, 299.57, 299.58]}, "2026": {"50 Free": [24.27, 24.33, 24.77, 24.9, 25.02, 25.29], "100 Free": [51.86, 53.85, 54.57, 54.89, 55.37, 55.66], "200 Free": [117.72, 118.59, 121.31, 121.84, 122.18, 122.68], "400 Free": [253.39, 257.62, 258.51, 259.35, 259.42, 259.75], "800 Free": [521.44, 531.43, 534.08, 534.46, 540.89, 549.07], "50 Back": [27.62, 27.87, 28.0, 29.01, 29.12, 29.13], "100 Back": [59.78, 60.1, 61.56, 61.71, 63.08, 63.34], "200 Back": [133.69, 134.65, 135.14, 136.42, 137.34, 139.69], "1500 Free": [984.85, 997.56, 1013.65, 1014.16, 1052.22, 1059.74], "50 Breast": [31.9, 31.97, 31.99, 32.04, 32.24, 32.34], "100 Breast": [66.68, 68.77, 70.3, 70.44, 70.77, 70.83], "200 Breast": [143.35, 149.58, 153.97, 154.04, 155.05, 158.35], "50 Fly": [25.93, 26.42, 26.46, 26.67, 27.2, 27.21], "100 Fly": [58.8, 59.46, 60.47, 60.77, 60.97, 60.98], "200 Fly": [130.6, 134.4, 137.87, 139.16, 140.89, 140.94], "200 IM": [131.6, 140.2, 140.31, 140.45, 140.48, 140.8], "400 IM": [293.12, 296.28, 296.79, 296.99, 299.74, 300.26]}}}};
+const ORDER = ["50 Free", "100 Free", "200 Free", "400 Free", "800 Free", "1500 Free", "50 Back", "100 Back", "200 Back", "50 Breast", "100 Breast", "200 Breast", "50 Fly", "100 Fly", "200 Fly", "200 IM", "400 IM"];
+const ELAB={'50 Free':'50 m Livres','100 Free':'100 m Livres','200 Free':'200 m Livres','400 Free':'400 m Livres','800 Free':'800 m Livres','1500 Free':'1500 m Livres','50 Back':'50 m Costas','100 Back':'100 m Costas','200 Back':'200 m Costas','50 Breast':'50 m Bruços','100 Breast':'100 m Bruços','200 Breast':'200 m Bruços','50 Fly':'50 m Mariposa','100 Fly':'100 m Mariposa','200 Fly':'200 m Mariposa','200 IM':'200 m Estilos','400 IM':'400 m Estilos'};
+const S={mode:'eur',N:3,g:'M',y:'2026',a:null,b:null,ref:'EUR'};
+
+function fmt(t){if(t==null||isNaN(t))return '—';if(t<60)return t.toFixed(2);const m=Math.floor(t/60);const s=(t-60*m);return m+':'+(s<10?'0':'')+s.toFixed(2);}
+function meanN(arr,N){if(!arr||arr.length===0)return null;const v=arr.slice(0,N).filter(x=>x!=null);if(v.length<N)return null;return v.reduce((a,b)=>a+b,0)/v.length;}
+function dataFor(code){const c=COUNTRIES[code];if(!c)return null;return (c[S.g]&&c[S.g][S.y])||null;}
+function meansFor(code){const d=dataFor(code);const o={};if(!d)return o;for(const e of ORDER){o[e]=meanN(d[e],S.N);}return o;}
+function refExists(){return !!(COUNTRIES[S.ref]&&dataFor(S.ref));}
+
+function rebuildSelects(){
+ const codes=Object.keys(COUNTRIES);
+ const opt=c=>`<option value="${c}">${COUNTRIES[c].label} (${c})</option>`;
+ const selA=document.getElementById('selA'),selB=document.getElementById('selB'),selR=document.getElementById('selRef');
+ selA.innerHTML=codes.map(opt).join(''); selB.innerHTML=codes.map(opt).join(''); selR.innerHTML=codes.map(opt).join('');
+ if(!S.a||!COUNTRIES[S.a])S.a=codes[0];
+ if(!S.b||!COUNTRIES[S.b])S.b=codes[1]||codes[0];
+ if(!COUNTRIES[S.ref])S.ref=codes.includes('EUR')?'EUR':codes[0];
+ selA.value=S.a; selB.value=S.b; selR.value=S.ref;
+}
+
+function tier(gp){ if(gp<=-2)return['Acima da média europeia','good'];
+ if(gp<=1)return['Ao nível da Europa','good']; if(gp<=3)return['Ligeiramente abaixo','']; 
+ if(gp<=6)return['Abaixo da Europa','bad']; return['Bastante abaixo da Europa','bad'];}
+
+let ch1=null,ch2=null;
+function destroy(){if(ch1){ch1.destroy();ch1=null}if(ch2){ch2.destroy();ch2=null}}
+
+function render(){
+ destroy();
+ // toggle controls per mode
+ document.getElementById('ctlB').style.display = S.mode==='vs'?'':'none';
+ document.getElementById('ctlRef').style.display = S.mode==='eur'?'':'none';
+ document.getElementById('lblA').textContent = S.mode==='vs'?'País A':'País';
+ const p=document.getElementById('panel');
+ if(S.mode==='eur') renderEur(p); else renderVs(p);
+}
+
+function renderEur(p){
+ if(!refExists()){
+  p.innerHTML=`<div class="empty"><b>Falta a referência «Europa».</b><br>
+   Esta vista mede a distância de cada país à Europa. Abra <b>«Carregar países»</b> em baixo e importe o <code>DATA.events</code> do relatório FPN — o código <code>EUR</code> é reconhecido como Europa. Enquanto isso, o modo <b>País vs País</b> funciona já com os dados embebidos.</div>`;
+  return;
+ }
+ const A=meansFor(S.a), E=meansFor(S.ref);
+ const rows=ORDER.map(e=>{const a=A[e],b=E[e];if(a==null||b==null)return null;const gs=a-b,gp=gs/b*100;return {e,a,b,gs,gp};}).filter(Boolean);
+ if(!rows.length){p.innerHTML=`<div class="empty">Sem provas comparáveis para ${COUNTRIES[S.a].label} em ${S.y}.</div>`;return;}
+ const avg=rows.reduce((s,r)=>s+r.gp,0)/rows.length;
+ const faster=rows.filter(r=>r.gs<0).length, slower=rows.filter(r=>r.gs>0).length;
+ const best=rows.slice().sort((x,y)=>x.gp-y.gp)[0], worst=rows.slice().sort((x,y)=>y.gp-x.gp)[0];
+ const [tl,tc]=tier(avg); const idx=Math.max(0,Math.min(100,Math.round(100-avg*4)));
+ p.innerHTML=`
+ <div class="eyebrow">Avaliação de nível</div>
+ <h2 class="sect">${COUNTRIES[S.a].label} face à Europa — ${S.g==='M'?'masculino':'feminino'}, ${S.y}</h2>
+ <p class="lead">Distância média do topo nacional (média das ${S.N} melhores marcas por prova) ao topo europeu, nas ${rows.length} provas com dados.</p>
+ <div class="kpis">
+  <div class="kpi"><div class="v ${tc}">${(avg>=0?'+':'')+avg.toFixed(1)}%</div><div class="l">Distância média à Europa</div></div>
+  <div class="kpi"><div class="v">${idx}<span style="font-size:14px;color:var(--muted)"> /100</span></div><div class="l">Índice de proximidade</div></div>
+  <div class="kpi"><div class="v">${faster} · ${slower}</div><div class="l">Provas acima · abaixo da Europa</div></div>
+  <div class="kpi"><div class="v ${tc}" style="font-size:18px">${tl}</div><div class="l">Classificação global</div></div>
+ </div>
+ <div class="expl">Em ${S.y}, o topo ${S.g==='M'?'masculino':'feminino'} ${COUNTRIES[S.a].label==='Portugal'?'português':'de '+COUNTRIES[S.a].label} está, em média, a <b>${(avg>=0?'+':'')+avg.toFixed(1)}%</b> da Europa nas ${S.N} melhores marcas. Mais perto: <b>${ELAB[best.e]}</b> (${(best.gp>=0?'+':'')+best.gp.toFixed(1)}%). Mais longe: <b>${ELAB[worst.e]}</b> (${(worst.gp>=0?'+':'')+worst.gp.toFixed(1)}%). ${faster?`Há <b>${faster}</b> prova(s) em que o país está à frente da Europa.`:'O país não supera a Europa em nenhuma prova nesta amostra.'}</div>
+ <div class="grid2">
+  <div class="chartbox"><canvas id="c1"></canvas></div>
+  <div><table><thead><tr><th>Prova</th><th>${S.a}</th><th>Europa</th><th>Δ s</th><th>Δ %</th></tr></thead><tbody>
+   ${rows.map(r=>`<tr><td>${ELAB[r.e]}</td><td>${fmt(r.a)}</td><td>${fmt(r.b)}</td>
+     <td class="${r.gs>0?'pos':'neg'}">${(r.gs>=0?'+':'')+r.gs.toFixed(2)}</td>
+     <td class="${r.gp>0?'pos':'neg'}">${(r.gp>=0?'+':'')+r.gp.toFixed(1)}%</td></tr>`).join('')}
+  </tbody></table></div>
+ </div>`;
+ const srt=rows.slice().sort((x,y)=>y.gp-x.gp);
+ ch1=new Chart(document.getElementById('c1'),{type:'bar',
+  data:{labels:srt.map(r=>ELAB[r.e]),datasets:[{data:srt.map(r=>r.gp),
+   backgroundColor:srt.map(r=>r.gp>0?'#185FA5':'#1f8a55'),borderRadius:4}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+   plugins:{legend:{display:false},title:{display:true,text:'Distância à Europa por prova (%) — barras maiores = mais longe'},
+    tooltip:{callbacks:{label:c=>` ${(c.raw>=0?'+':'')+c.raw.toFixed(1)}%`}}},
+   scales:{x:{grid:{color:'#eef2f6'},ticks:{callback:v=>v+'%'}},y:{ticks:{font:{size:10}}}}}});
+}
+
+function renderVs(p){
+ if(S.a===S.b){p.innerHTML=`<div class="empty">Escolha <b>dois países diferentes</b> para o confronto.${Object.keys(COUNTRIES).length<2?' De momento só está carregado um país — adicione outro em «Carregar países».':''}</div>`;return;}
+ const A=meansFor(S.a),B=meansFor(S.b);
+ const rows=ORDER.map(e=>{const a=A[e],b=B[e];if(a==null||b==null)return null;const ds=a-b,dp=ds/b*100;return{e,a,b,ds,dp};}).filter(Boolean);
+ if(!rows.length){p.innerHTML=`<div class="empty">Sem provas comparáveis entre ${COUNTRIES[S.a].label} e ${COUNTRIES[S.b].label} em ${S.y}.</div>`;return;}
+ const winA=rows.filter(r=>r.ds<0).length, winB=rows.filter(r=>r.ds>0).length, tie=rows.filter(r=>r.ds===0).length;
+ const avg=rows.reduce((s,r)=>s+Math.abs(r.dp),0)/rows.length;
+ const bigA=rows.filter(r=>r.ds<0).sort((x,y)=>x.dp-y.dp)[0];
+ const bigB=rows.filter(r=>r.ds>0).sort((x,y)=>y.dp-x.dp)[0];
+ const lead = winA>winB?COUNTRIES[S.a].label:(winB>winA?COUNTRIES[S.b].label:'Equilíbrio');
+ p.innerHTML=`
+ <div class="eyebrow">Confronto direto</div>
+ <h2 class="sect"><span class="tag a">${S.a}</span> ${COUNTRIES[S.a].label} &nbsp;vs&nbsp; <span class="tag b">${S.b}</span> ${COUNTRIES[S.b].label} — ${S.g==='M'?'masculino':'feminino'}, ${S.y}</h2>
+ <p class="lead">Confronto prova a prova sobre as ${S.N} melhores marcas. Em cada prova vence quem tiver o tempo mais rápido.</p>
+ <div class="kpis">
+  <div class="kpi"><div class="v">${winA} · ${winB}${tie?` · ${tie}`:''}</div><div class="l">Provas: ${S.a} · ${S.b}${tie?' · empates':''}</div></div>
+  <div class="kpi"><div class="v">${lead}</div><div class="l">Vantagem global</div></div>
+  <div class="kpi"><div class="v">${avg.toFixed(1)}%</div><div class="l">Diferença média (abs.)</div></div>
+  <div class="kpi"><div class="v" style="font-size:15px">${bigA?ELAB[bigA.e]+' ('+bigA.dp.toFixed(1)+'%)':'—'}<br><span style="color:var(--muted);font-size:12px">melhor de ${S.a}</span></div><div class="l">${bigB?'Melhor de '+S.b+': '+ELAB[bigB.e]+' (+'+bigB.dp.toFixed(1)+'%)':''}</div></div>
+ </div>
+ <div class="grid2">
+  <div class="chartbox"><canvas id="c2"></canvas></div>
+  <div><table><thead><tr><th>Prova</th><th>${S.a}</th><th>${S.b}</th><th>Δ s</th><th>Mais rápido</th></tr></thead><tbody>
+   ${rows.map(r=>`<tr><td>${ELAB[r.e]}</td><td>${fmt(r.a)}</td><td>${fmt(r.b)}</td>
+     <td class="${r.ds>0?'pos':'neg'}">${(r.ds>=0?'+':'')+r.ds.toFixed(2)}</td>
+     <td><span class="tag ${r.ds<0?'a':'b'}">${r.ds<0?S.a:S.b}</span></td></tr>`).join('')}
+  </tbody></table></div>
+ </div>
+ <p class="note" style="margin-top:10px">Δ s = ${S.a} − ${S.b}. Negativo (verde) ⇒ ${S.a} mais rápido; positivo (azul) ⇒ ${S.b} mais rápido.</p>`;
+ const srt=rows.slice().sort((x,y)=>x.dp-y.dp);
+ ch2=new Chart(document.getElementById('c2'),{type:'bar',
+  data:{labels:srt.map(r=>ELAB[r.e]),datasets:[{data:srt.map(r=>r.dp),
+   backgroundColor:srt.map(r=>r.ds<0?'#185FA5':'#BA7517'),borderRadius:4}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+   plugins:{legend:{display:false},title:{display:true,text:'Vantagem por prova (%) — esq.='+S.a+', dir.='+S.b},
+    tooltip:{callbacks:{label:c=>c.raw<0?` ${S.a} mais rápido ${Math.abs(c.raw).toFixed(1)}%`:` ${S.b} mais rápido ${c.raw.toFixed(1)}%`}}},
+   scales:{x:{grid:{color:'#eef2f6'},ticks:{callback:v=>v+'%'}},y:{ticks:{font:{size:10}}}}}});
+}
+
+/* ---- importers ---- */
+function addCountry(code,label,obj){COUNTRIES[code]={label:label||code,M:obj.M||{},F:obj.F||{}};}
+function importReport(txt){
+ let o=JSON.parse(txt); const ev=o.events||o; let added={};
+ for(const g of ['M','F']){const block=ev[g];if(!block)continue;
+   for(const e in block){const raw=block[e].raw||block[e];if(!raw)continue;
+     for(const region in raw){const yrs=raw[region];if(typeof yrs!=='object')continue;
+       for(const y in yrs){const arr=yrs[y];if(!Array.isArray(arr))continue;
+         const code=region.toUpperCase();
+         COUNTRIES[code]=COUNTRIES[code]||{label:code==='EUR'?'Europa':(code==='POR'?'Portugal':code),M:{},F:{}};
+         COUNTRIES[code][g][y]=COUNTRIES[code][g][y]||{};
+         COUNTRIES[code][g][y][e]=arr;
+         added[code]=(added[code]||0)+1;}}}}
+ return added;
+}
+document.getElementById('btnReport').onclick=()=>{
+ const m=document.getElementById('impMsg');
+ try{const a=importReport(document.getElementById('impReport').value);
+   const k=Object.keys(a); if(!k.length){m.innerHTML='<span style="color:var(--bad)">Não encontrei regiões (raw.EUR/POR…) no texto colado.</span>';return;}
+   if(!COUNTRIES['EUR']&&!COUNTRIES[S.ref])S.ref=k[0];
+   rebuildSelects();render();
+   m.innerHTML='<span style="color:var(--good)">Importado: '+k.map(c=>COUNTRIES[c].label+' ('+c+')').join(', ')+'.</span>';
+ }catch(e){m.innerHTML='<span style="color:var(--bad)">JSON inválido: '+e.message+'</span>';}
+};
+document.getElementById('btnManual').onclick=()=>{
+ const m=document.getElementById('impMsg');
+ try{const o=JSON.parse(document.getElementById('impManual').value);
+   if(!o.code)throw new Error('falta o campo "code"');
+   addCountry(o.code.toUpperCase(),o.label,o); rebuildSelects(); render();
+   m.innerHTML='<span style="color:var(--good)">País adicionado: '+(o.label||o.code)+'.</span>';
+ }catch(e){m.innerHTML='<span style="color:var(--bad)">JSON inválido: '+e.message+'</span>';}
+};
+document.getElementById('btnTemplate').onclick=()=>{
+ document.getElementById('impManual').value=JSON.stringify({code:'NED',label:'Países Baixos',M:COUNTRIES.NED.M,F:COUNTRIES.NED.F},null,1);
+};
+
+/* ---- wire controls ---- */
+function seg(id,key,cast){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ S[key]=cast?cast(b.dataset[Object.keys(b.dataset)[0]]):b.dataset[Object.keys(b.dataset)[0]];render();});}
+seg('segMode','mode'); seg('segN','N',Number); seg('segG','g'); seg('segY','y');
+document.getElementById('selA').onchange=e=>{S.a=e.target.value;render();};
+document.getElementById('selB').onchange=e=>{S.b=e.target.value;render();};
+document.getElementById('selRef').onchange=e=>{S.ref=e.target.value;render();};
+
+rebuildSelects(); render();
+</script>
+</body></html>
